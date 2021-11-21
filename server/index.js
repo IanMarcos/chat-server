@@ -8,6 +8,7 @@ class Server {
         this.app = express();
         this.port = process.env.PORT;
         this.paths = {
+            auth:'/api/auth',
             users:'/api/users'
         };
 
@@ -39,11 +40,12 @@ class Server {
     }
 
     routes() {
+        this.app.use(this.paths.auth, require('../routes/auth'));
         this.app.use(this.paths.users, require('../routes/users'));
     }
 
     init() {
-        this.app.listen(this.port, () => console.log(`Running on ${this.port}`))
+        this.app.listen(this.port, () => console.log(`Corriendo en ${this.port}`))
     }
 }
 

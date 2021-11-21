@@ -2,15 +2,15 @@ const { Router } = require('express');
 const { body, param } = require('express-validator');
 
 const { userExist, validateResults } = require('./../middlewares/');
-const { getUserById, createUser } = require('./../controllers/users');
+const { getUserById, createUser, updateUser, deleteUser } = require('../controllers/user');
 
 const router = Router()
 
 router.get('/:uid', [
-    param('uid', 'El id del usuario es necesario').isMongoId(),
+    param('uid', 'No es un id de Mongo').isMongoId(),
     param('uid').custom(userExist),
     validateResults
-], getUserById)
+], getUserById);
 
 router.post('/', [
     body('email', 'El email es obligatorio').notEmpty(),
@@ -18,5 +18,17 @@ router.post('/', [
     body('password', 'La contraseña es obligatoria').notEmpty(),
     validateResults
 ], createUser);
+
+router.put('/:uid', [
+    param('uid', 'No es un id de Mongo').isMongoId(),
+    param('uid').custom(userExist),
+    validateResults
+], updateUser);
+
+router.delete('/:uid', [
+    param('uid', 'No es un id de Mongo').isMongoId(),
+    param('uid').custom(userExist),
+    validateResults
+], deleteUser);
 
 module.exports = router;
