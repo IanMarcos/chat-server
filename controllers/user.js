@@ -34,25 +34,44 @@ const updateUser = async(req, res) => {
         return res.status(400).json({ results:{err: 'No hay datos para actualizar'} });
     }
 
-    const user = req.body;
-    if(user.email){
-        const usedEmail = await User.findOne({email: user.email});
+    const data = req.body;
+    const { authUser } = req;
 
-        //TODO verificar que este tratando de actualizar a su mismo email
+    //Verificación de que sea el mismo usuario en el id del url y el del token
+    if(uid !== authUser._id.toString()){
+        return res.status(401).json({ results:{err: 'Solo el usuario puder cambiar sus datos'} });
+    }
+
+    if(data.email){
+        
+        //Verificación de que el usuario no actualice su correo al mismo
+        if(data.email === authUser.email){
+            return res.status(401).json({ results:{err: 'No se puede actualizar con el mismo correo'} });
+        }
+
+        //Verificación de que el correo no esté ya en la DB
+        const usedEmail = await User.findOne({email: data.email});
         if(usedEmail){
             return res.status(400).json({ results:{err: 'Email ya en uso'} });
         }
     }
-    if(user.password){
-        user.password = await hashPassword( user.password );
-    }
 
-    const updatedUser = await User.findByIdAndUpdate(uid, user, {new:true}).select('-password -active -__v');
+    //Hashing de la nueva contraseña
+    if(data.password) data.password = await hashPassword( data.password );
+    
+    const updatedUser = await User.findByIdAndUpdate(uid, data, {new:true}).select('-password -active -__v');
     res.status(200).json({ results: {updatedUser} });
 }
 
 const deleteUser = async(req, res) => {
     const { uid } = req.params;
+    const { authUser } = req;
+
+    //Verificación de que sea el mismo usuario en el id del url y el del token
+    console.log(authUser);
+    if( uid !== authUser._id.toString()){
+        return res.status(401).json({ results:{err: 'Solo el usuario puder eliminar su cuenta'} });
+    }
     const deletedUser = await User.findByIdAndUpdate(uid, {active:false}, {new:true}).select('-password -__v');;
     res.status(200).json({ results: {deletedUser} });
 }
