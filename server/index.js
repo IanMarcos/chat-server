@@ -1,25 +1,31 @@
 const cors = require('cors');
 const express = require('express');
+const { createServer } = require('http');
 const mongoose = require('mongoose');
+const { socketController } = require('./../sockets/controller');
 
 class Server {
 
     constructor(){
+        //Creación del servidor de express con socket.io
         this.app = express();
+        this.server = createServer(this.app);
+        this.io = require('socket.io')(this.server)
+        
+        //Variables de clase
         this.port = process.env.PORT;
         this.paths = {
             auth:'/api/auth',
             users:'/api/users'
         };
 
-        //DB
         this.connectDB();
 
-        //Middlewares
         this.middlewares();
 
-        //Routes
         this.routes();
+
+        this.sockets();
     }
 
     async connectDB(){
@@ -44,8 +50,12 @@ class Server {
         this.app.use(this.paths.users, require('../routes/users'));
     }
 
+    sockets() {
+        this.io.on('connection', socketController);
+    }
+
     init() {
-        this.app.listen(this.port, () => console.log(`Corriendo en ${this.port}`))
+        this.server.listen(this.port, () => console.log(`Corriendo en ${this.port}`));
     }
 }
 

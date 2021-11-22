@@ -3,15 +3,17 @@ const { hashPassword } = require('../helpers/bcrypt');
 
 const getUserById = async(req, res) => {
     const {uid} = req.params;
-
-    //Se recupera el usuario excluyendo la contraseña, su estado, y __v
-    const user = await User.findById(uid).select('-password -active -__v');
-
-    res.status(200).json({ result: {user} });
+    try {
+        //Se recupera el usuario excluyendo la contraseña, su estado, y __v
+        const user = await User.findById(uid).select('-password -active -__v');
+    
+        res.status(200).json({ result: {user} });
+    } catch (error) {
+        res.status(500).json({ err: {error} });
+    }
 }
 
 const createUser = async(req, res) => {
-
     const { name, email, password } = req.body;
     const user = new User({name, email, password});
 
@@ -20,9 +22,13 @@ const createUser = async(req, res) => {
         user.name = email.split('@')[0];
     }
     user.password = await hashPassword( password );
-    await user.save();
-
-    res.status(201).json({ results: {msg:'Creación exitosa', uid: user._id} });
+    
+    try {
+        await user.save();
+        res.status(201).json({ results: {msg:'Creación exitosa', uid: user._id} });
+    } catch (error) {
+        res.status(500).json({ err: {error} });
+    }
 
 }
 
@@ -43,7 +49,6 @@ const updateUser = async(req, res) => {
     }
 
     if(data.email){
-        
         //Verificación de que el usuario no actualice su correo al mismo
         if(data.email === authUser.email){
             return res.status(401).json({ results:{err: 'No se puede actualizar con el mismo correo'} });
@@ -58,9 +63,14 @@ const updateUser = async(req, res) => {
 
     //Hashing de la nueva contraseña
     if(data.password) data.password = await hashPassword( data.password );
+
+    try {
+        const updatedUser = await User.findByIdAndUpdate(uid, data, {new:true}).select('-password -active -__v');
+        res.status(200).json({ results: {updatedUser} });
+    } catch (error) {
+        res.status(500).json({ err: {error} });
+    }
     
-    const updatedUser = await User.findByIdAndUpdate(uid, data, {new:true}).select('-password -active -__v');
-    res.status(200).json({ results: {updatedUser} });
 }
 
 const deleteUser = async(req, res) => {
@@ -72,8 +82,13 @@ const deleteUser = async(req, res) => {
     if( uid !== authUser._id.toString()){
         return res.status(401).json({ results:{err: 'Solo el usuario puder eliminar su cuenta'} });
     }
-    const deletedUser = await User.findByIdAndUpdate(uid, {active:false}, {new:true}).select('-password -__v');;
-    res.status(200).json({ results: {deletedUser} });
+
+    try {
+        const deletedUser = await User.findByIdAndUpdate(uid, {active:false}, {new:true}).select('-password -__v');;
+        res.status(200).json({ results: {deletedUser} });
+    } catch (error) {
+        res.status(500).json({ err: {error} });
+    }
 }
 
 module.exports = {
