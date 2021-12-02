@@ -1,5 +1,6 @@
 const User = require('../models/user');
 const { hashPassword } = require('../helpers/bcrypt');
+const { generateJWT } = require('./../helpers/jwt');
 
 const getUserById = async(req, res) => {
     const {uid} = req.params;
@@ -18,14 +19,15 @@ const createUser = async(req, res) => {
     const user = new User({name, email, password});
 
     //Definición del nombre en caso de que no haya sido provisto
-    if(!name){
+    if(!name || name.length === 0){
         user.name = email.split('@')[0];
     }
     user.password = await hashPassword( password );
     
     try {
         await user.save();
-        res.status(201).json({ results: {msg:'Creación exitosa', uid: user._id} });
+        const cvToken = generateJWT({uid: user._id, uName: user.name});
+        res.status(201).json({ results: {msg:'Creación exitosa', cvToken, uName: user.name} });
     } catch (error) {
         res.status(500).json({ err: {error} });
     }
@@ -84,7 +86,7 @@ const deleteUser = async(req, res) => {
     }
 
     try {
-        const deletedUser = await User.findByIdAndUpdate(uid, {active:false}, {new:true}).select('-password -__v');;
+        const deletedUser = await User.findByIdAndUpdate(uid, {active:false}, {new:true}).select('-password -__v');
         res.status(200).json({ results: {deletedUser} });
     } catch (error) {
         res.status(500).json({ err: {error} });

@@ -7,31 +7,33 @@ const { socketController } = require('./../sockets/controller');
 class Server {
 
     constructor(){
-        //Creación del servidor de express con socket.io
-        this.app = express();
-        this.server = createServer(this.app);
-        this.io = require('socket.io')(this.server)
-        
         //Variables de clase
         this.port = process.env.PORT;
         this.paths = {
             auth:'/api/auth',
             users:'/api/users'
         };
+        this.ioConfiguration = {
+            cors: {
+                origin:"http://localhost:3000"
+            }
+        }
+
+        //Creación del servidor de express con socket.io
+        this.app = express();
+        this.server = createServer(this.app);
+        this.io = require('socket.io')(this.server, this.ioConfiguration);
+
 
         this.connectDB();
-
         this.middlewares();
-
         this.routes();
-
-        this.sockets();
+        this.socketsConfig();
     }
 
     async connectDB(){
         try{
             await mongoose.connect(process.env.MONGODB_CNN);
-            console.log('DB conectada');
         } catch(err){
             console.log(err);
             throw new Error('Error en la conexión a la DB');
@@ -50,12 +52,12 @@ class Server {
         this.app.use(this.paths.users, require('../routes/users'));
     }
 
-    sockets() {
+    socketsConfig() {
         this.io.on('connection', socketController);
     }
 
     init() {
-        this.server.listen(this.port, () => console.log(`Corriendo en ${this.port}`));
+        this.server.listen(this.port);
     }
 }
 

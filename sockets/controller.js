@@ -1,6 +1,7 @@
 
-const socketController = socketClient => {
-    console.log(`socket ${socketClient} conectado`);
+const socketController = client => {
+    console.log(`socket ${client.id} conectado`);
+    client.on('disconnect', () => console.log(`${client.id} desconectado`))
 }
 
 module.exports = {
