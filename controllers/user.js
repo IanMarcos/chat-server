@@ -2,6 +2,15 @@ const User = require('../models/user');
 const { hashPassword } = require('../helpers/bcrypt');
 const { generateJWT } = require('./../helpers/jwt');
 
+const getAllUsers = async(req, res) => {
+    try {
+        const users = await User.find({active: true}).select('-password -active -__v');
+        res.status(200).json( {results: {users}} );
+    } catch (error) {
+        res.status(500).json( {results: {err:'Fallo en la conexión a la DB'}} );
+    }
+}
+
 const getUserById = async(req, res) => {
     const {uid} = req.params;
     try {
@@ -94,6 +103,7 @@ const deleteUser = async(req, res) => {
 }
 
 module.exports = {
+    getAllUsers,
     getUserById,
     createUser,
     updateUser,

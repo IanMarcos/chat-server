@@ -2,12 +2,28 @@ const { passwordMatch } = require('./../helpers/bcrypt');
 const { generateJWT } = require('./../helpers/jwt');
 const User = require('./../models/user');
 
-const validateUser = (req, res) => {
+const renovateToken = (req, res) => {
     const user = req.authUser;
     const data = {uid: user._id, uName: user.name};
     //Renueva el token
     const cvToken = generateJWT(data);
     res.status(200).json({results: {cvToken, user}});
+}
+
+const validatePassword = async(req, res) => {
+    const {password} = req.body;
+
+    const user = await User.findById(req.authUser);
+    if( !user || !user.active ){
+        return res.status(401).json({ results:{ err:'En el token no había un usuario válido'} });
+    }
+
+    if(! await passwordMatch(password, user.password)){
+        return res.status(400).json( {results: {err:'La contraseña no es válida'} } );
+    }
+
+    res.status(200).json( {results: {msg:'Ok'}});
+
 }
 
 const signIn = async(req, res) => {
@@ -43,5 +59,6 @@ const signIn = async(req, res) => {
 
 module.exports = {
     signIn,
-    validateUser
+    renovateToken,
+    validatePassword,
 };

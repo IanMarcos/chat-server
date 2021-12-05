@@ -2,9 +2,11 @@ const { Router } = require('express');
 const { body, param } = require('express-validator');
 
 const { userExistById, validateResults, validateJWT } = require('./../middlewares/');
-const { getUserById, createUser, updateUser, deleteUser } = require('../controllers/user');
+const { getAllUsers, getUserById, createUser, updateUser, deleteUser } = require('../controllers/user');
 
 const router = Router()
+
+router.get('/', getAllUsers)
 
 router.get('/:uid', [
     param('uid', 'No es un id de Mongo').isMongoId(),
