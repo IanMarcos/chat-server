@@ -21,8 +21,10 @@ const validatePassword = async(req, res) => {
     if(! await passwordMatch(password, user.password)){
         return res.status(400).json( {results: {err:'La contraseña no es válida'} } );
     }
+    
+    const uid = user._id.toString();
 
-    res.status(200).json( {results: {msg:'Ok'}});
+    res.status(200).json( {results: {uid}});
 
 }
 

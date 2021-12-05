@@ -89,7 +89,6 @@ const deleteUser = async(req, res) => {
     const { authUser } = req;
 
     //Verificación de que sea el mismo usuario en el id del url y el del token
-    console.log(authUser);
     if( uid !== authUser._id.toString()){
         return res.status(401).json({ results:{err: 'Solo el usuario puder eliminar su cuenta'} });
     }
