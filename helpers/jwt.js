@@ -9,7 +9,11 @@ const generateJWT = (payload) => {
 }
 
 const verifyJWT = (token) => {
-    return jwt.verify(token, jwtKey); 
+    try {
+        return jwt.verify(token, jwtKey); 
+    } catch (error) {
+        return {};
+    }
 }
 
 module.exports = {
