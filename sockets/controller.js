@@ -25,17 +25,22 @@ const socketController = async(client, ioServer) => {
     //Unir a una sala privada con el propio ID
     client.join(user._id.toString());
 
+    client.on('join-room', ({user1, user2}, callback)=>{
+        const roomIndex = chat.joinRoom(user1, user2);
+        callback(roomIndex);
+    })
+
     //Manejo de mensajes
     client.on('send-message', ({uid, msg}) => {
         chat.sendMessage(user._id, user.name, msg);
         client.to(uid).emit('priv-message', {msgs: chat.allMessages});
         client.emit('priv-message', {msgs: chat.allMessages});
-    })
+    });
 
     client.on('disconnect', () => {
         chat.disconnectUser(user._id);
         ioServer.emit('active-users', chat.usersArr); 
-    })
+    });
 }
 
 module.exports = {
