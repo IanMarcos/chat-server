@@ -9,8 +9,6 @@ class Message {
 class Room {
     constructor(user1, user2) {
         this.id = user1 + '|' + user2;
-        // this.uid1 = user1;
-        // this.uid2 = user2;
         this.messages = []
     }
 
