@@ -15,7 +15,7 @@ class Server {
         };
         this.ioConfiguration = {
             cors: {
-                origin:"http://localhost:3000"
+                origins:["*"]
             }
         }
 
