@@ -18,9 +18,14 @@ class Room {
         return[this.uid1, this.uid2]
     }
 
+    get allMessages(){
+        return this.messages;
+    }
+
     sendMessage(uid, name, msg) {
         this.messages.unshift( new Message(uid, name, msg) );
     }
+
 }
 
 class Chat {
@@ -31,10 +36,6 @@ class Chat {
 
     get usersArr(){
         return Object.values(this.users);
-    }
-
-    get allMessages(){
-        return this.messages;
     }
 
     joinRoom(user1, user2) {
