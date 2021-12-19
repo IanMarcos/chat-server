@@ -8,7 +8,6 @@ Este es un servidor Rest implementado usando **Express**, el cual se conecta a u
 Adicionalmente al manejo de usuarios, el server implementa sockets con la librería **Socket.io** para permitir a los usuarios conectados chatear entre ellos.
 
 ***
-Hecho por **Ian Marcos Ortiz**. 
 ***
 
 # REST Server with sockets

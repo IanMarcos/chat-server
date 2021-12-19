@@ -1,7 +1,7 @@
 {
-  "name": "cv-rest-server",
-  "version": "0.1.0",
-  "description": "Rest server para hoja de vida",
+  "name": "cv-web-server",
+  "version": "1.0.0",
+  "description": "Rest server with sockets",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
